@@ -1,8 +1,8 @@
 {
-    "name": "ngoclb/yii2-advanced-app-with-api",
+    "name": "lbngoc/yii2-advanced-app-template",
     "description": "Yii2 Advanced Template and API",
     "keywords": ["yii2", "rest", "application template", "api"],
-    "homepage": "https://github.com/ngoclb/yii2-advanced-app-api",
+    "homepage": "https://github.com/lbngoc/yii2-advanced-app-template",
     "type": "project",
     "license": "BSD-4-Clause",
     "authors": [
@@ -13,8 +13,8 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/githubjeka/yii2-rest/issues",
-        "source": "https://github.com/githubjeka/yii2-rest"
+        "issues": "https://github.com/lbngoc/yii2-advanced-app-template/issues",
+        "source": "https://github.com/lbngoc/yii2-advanced-app-template"
     },
     "minimum-stability": "dev",
     "require": {
