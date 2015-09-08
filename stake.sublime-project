@@ -1,0 +1,24 @@
+{
+	"folders":
+	[
+		{
+			"folder_exclude_patterns":
+			[
+				"node_modules",
+				"tests",
+				"api/web/assets",
+				"backend/web/assets",
+				"frontend/web/assets",
+				"console/runtime",
+				"api/runtime",
+				"backend/runtime",
+				"frontend/runtime",
+			],
+			"path": "."
+		}
+	],
+	"settings":
+    {
+        "tab_size": 4
+    },
+}

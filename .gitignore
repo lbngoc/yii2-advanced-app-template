@@ -6,7 +6,7 @@
 
 # netbeans project files
 nbproject
-*.sublime*
+*.sublime-workspace
 
 # zend studio for eclipse project files
 .buildpath
