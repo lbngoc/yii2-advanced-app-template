@@ -20,10 +20,10 @@ return [
         ],
     ],
     'components' => [
-        'user' => [
-            'identityClass' => 'common\models\User',
-            'enableSession' => false,
-        ],
+        // 'user' => [
+        //     'identityClass' => 'common\models\User',
+        //     'enableSession' => false,
+        // ],
         'response' => [
             'format' => yii\web\Response::FORMAT_JSON,
             'charset' => 'UTF-8',

@@ -7,60 +7,22 @@ use backend\models\User;
 use backend\models\UserSearch;
 use yii\web\Controller;
 use yii\helpers\Url;
+use yii\helpers\Json;
+use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use sintret\gii\models\LogUpload;
 use sintret\gii\components\Util;
 
+use amnah\yii2\user\models\UserKey;
+use amnah\yii2\user\models\UserAuth;
 
 /**
  * UserController implements the CRUD actions for User model.
  */
 class UserController extends Controller
 {
-
-    // public function behaviors()
-    // {
-    //     return [
-    //     'access' => [
-    //             'class' => \yii\filters\AccessControl::className(),
-    //             'rules' => [
-    //                 [
-    //                     'allow' => true,
-    //                     'actions' => ['index','view','sample','parsing-log','excel'],
-    //                     'roles' => ['viewer']
-    //                 ],
-    //                 [
-    //                     'allow' => true,
-    //                     'actions' => ['create','parsing'],
-    //                     'roles' => ['author']
-    //                 ],
-    //                 [
-    //                     'allow' => true,
-    //                     'actions' => ['update'],
-    //                     'roles' => ['editor']
-    //                 ],
-    //                 [
-    //                     'allow' => true,
-    //                     'actions' => ['delete', 'delete-all'],
-    //                     'roles' => ['admin']
-    //                 ],
-    //                 [
-    //                     'allow' => true,
-    //                     'roles' => ['admin']
-    //                 ],
-    //             ],
-    //         ],
-    //         'verbs' => [
-    //             'class' => VerbFilter::className(),
-    //             'actions' => [
-    //                 'delete' => ['post'],
-    //             ],
-    //         ],
-    //     ];
-    // }
-
     /**
      * Lists all User models.
      * @return mixed
@@ -94,14 +56,49 @@ class UserController extends Controller
     }
 
     /**
-     * Displays a single User model.
+     * Displays a single User model using DetailView
+     * Admin can edit/delete User model here
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($id, $act = 'add')
     {
+        $model = $id > 0 ? $this->findModel($id) : new User();
+        $post = Yii::$app->request->post();
+        // DELETE: process ajax delete
+        if (Yii::$app->request->isAjax && isset($post['kvdelete'])) {
+            $profile = $model->profile;
+            UserKey::deleteAll(['user_id' => $model->id]);
+            UserAuth::deleteAll(['user_id' => $model->id]);
+            if ($profile) $profile->delete();
+            $model->delete();
+            echo Json::encode([
+                'success' => true,
+                'messages' => [
+                    'kv-detail-info' => 'This user was successfully deleted. ' .
+                        Html::a('<i class="glyphicon glyphicon-hand-right"></i>  Click here',
+                            ['/user/admin'], ['class' => 'btn btn-sm btn-success']) . ' to return the list.'
+                ]
+            ]);
+            return;
+        }
+        // UPDATE: return messages on update of record
+        if (!empty($post)) {
+            $profile = $model->profile ? $model->profile :
+                Yii::$app->getModule("user")->model("Profile");
+            $model->setScenario("admin");
+            if ($model->load($post) && $model->validate() && $profile->load($post) && $profile->validate()) {
+                $model->save(false);
+                $profile->setUser($model->id)->save(false);
+                Yii::$app->session->setFlash('kv-detail-success', 'Well done! successfully to save data!');
+            } else {
+                Yii::$app->session->setFlash('kv-detail-error', 'Something went wrong !');
+            }
+        }
+        // VIEW
         return $this->render('view', [
-            'model' => $id == 0 ? new User() : $this->findModel($id),
+            'model' => $model,
+            'act' => $act
         ]);
     }
 
@@ -112,6 +109,8 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
+        // $this->redirect(["view?id=new"]);
+
         $model = new User();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -132,6 +131,8 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
+        // $this->redirect(["view?id={$id}&act=edit"]);
+
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -152,6 +153,8 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
+        // $this->redirect(["view?id={$id}&act=edit"]);
+
         $this->findModel($id)->delete();
         Yii::$app->session->setFlash('success', 'Well done! successfully to deleted data!  ');
 

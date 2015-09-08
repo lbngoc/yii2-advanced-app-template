@@ -13,9 +13,7 @@ return [
             'decimalSeparator' => ',',
             'thousandSeparator' => ' ',
             'currencyCode' => '$',
-       ],
-    ],
-    'components' => [
+        ],
         'user' => [
             'class' => 'amnah\yii2\user\components\User',
         ],
@@ -49,6 +47,7 @@ return [
         'user' => [
             'class' => 'amnah\yii2\user\Module',
             // set custom module properties here ...
+            'emailConfirmation' => false,
         ],
     ],
 ];

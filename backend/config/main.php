@@ -30,8 +30,23 @@ return [
         'dynagrid' => [
             'class' => '\kartik\dynagrid\Module',
         ],
+        // override yii2-user module, controllers and views
+        'user' => [
+            'class' => 'amnah\yii2\user\Module',
+            'controllerMap' => [
+                'admin' => 'backend\controllers\UserController',
+            ],
+            // 'modelClasses'  => [
+                // 'User' => 'backend\models\User', // note: don't forget user::identityClass above
+                // 'Profile' => 'app\models\MyProfile',
+            // ],
+        ],
     ],
     'components' => [
+        'user' => [
+            // 'class' => 'backend\models\User',
+            // 'identityClass' => 'backend\models\User',
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -44,13 +59,13 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        // 'view' => [
-        //     'theme' => [
-        //         'pathMap' => [
-        //            '@app/views' => '@vendor/dmstr/yii2-adminlte-asset/example-views/yiisoft/yii2-app'
-        //         ],
-        //     ],
-        // ],
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                   '@vendor/amnah/yii2-user/views/admin' => '@backend/views/user',
+                ],
+            ],
+        ],
         'assetManager' => [
             'bundles' => [
                 'dmstr\web\AdminLteAsset' => [
@@ -79,6 +94,9 @@ return [
             'enablePrettyUrl' => true,
             // 'enableStrictParsing' => true,
             'showScriptName' => false,
+            'rules' => [
+
+            ]
         ],
     ],
     'params' => $params,

@@ -1,7 +1,7 @@
 <?php
 namespace api\versions\v1\controllers;
 
-use common\models\LoginForm;
+use api\models\LoginForm;
 use common\models\RegisterForm;
 use yii\rest\Controller;
 
@@ -11,6 +11,25 @@ use yii\rest\Controller;
  */
 class UserController extends Controller
 {
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        // $behaviors['authenticator'] = [
+        //     'class' => \yii\filters\auth\QueryParamAuth::className(),
+        // ];
+        $behaviors['verbs'] = [
+            'class' => \yii\filters\VerbFilter::className(),
+            'actions' => [
+                'login'  => ['post'],
+                // 'view'   => ['get'],
+                // 'create' => ['get', 'post'],
+                // 'update' => ['get', 'put', 'post'],
+                // 'delete' => ['post', 'delete'],
+            ],
+        ];
+        return $behaviors;
+    }
+
     /**
      * This method implemented to demonstrate the receipt of the token.
      * Do not use it on production systems.
@@ -21,9 +40,15 @@ class UserController extends Controller
         $model = new LoginForm();
 
         if ($model->load(\Yii::$app->getRequest()->getBodyParams(), '') && $model->login()) {
-            return \Yii::$app->user->identity->getAuthKey();
+            return [
+                'success' => true,
+                'data' => $model->getUser()
+            ];
         } else {
-            return $model;
+            return [
+                'success' => false,
+                'data' => $model->errors
+            ];
         }
     }
 

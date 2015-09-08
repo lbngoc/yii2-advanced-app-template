@@ -1,9 +1,14 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
 use backend\models\User;
+
+$user = Yii::$app->getModule("user")->model("User");
+$role = Yii::$app->getModule("user")->model("Role");
+
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -19,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
      $toolbars = [
         ['content' =>
-            Html::a('<i class="glyphicon glyphicon-plus"></i> Add user', ['user/create'], ['type' => 'button', 'title' => 'Add ' . $this->title, 'class' => 'btn btn-success']) . ' ' .
+            Html::a('<i class="glyphicon glyphicon-plus"></i> Add user', ['admin/view?id=new'], ['type' => 'button', 'title' => 'Add ' . $this->title, 'class' => 'btn btn-success']) . ' ' .
             // Html::a('<i class="fa fa-file-excel-o"></i>', ['user/parsing'], ['type' => 'button', 'title' => 'Parsing Excel ' . $this->title, 'class' => 'btn btn-warning']) . ' ' .
             // Html::button('<i class="fa fa-download"></i>', ['type' => 'button', 'title' => 'Excel Backup ' . $this->title, 'class' => 'btn btn-default','id'=>'backupExcel']) . ' ' .
             Html::button('<i class="glyphicon glyphicon-trash"></i> Delete selected users', ['type' => 'button', 'title' => 'Delete Selected ' . $this->title, 'class' => 'btn btn-danger', 'id' => 'deleteSelected']) . ' ' .
@@ -39,9 +44,28 @@ $this->params['breadcrumbs'][] = $this->title;
         ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
             'username',
             'email:email',
-            'auth_key',
+            'api_key',
+            'profile.full_name',
         [
-            'attribute'=>'created_at',
+            'attribute' => 'role_id',
+            'label' => Yii::t('user', 'Role'),
+            'filter' => $role::dropdown(),
+            'value' => function($model, $index, $dataColumn) use ($role) {
+                $roleDropdown = $role::dropdown();
+                return $roleDropdown[$model->role_id];
+            },
+        ],
+        [
+            'attribute' => 'status',
+            'label' => Yii::t('user', 'Status'),
+            'filter' => $user::statusDropdown(),
+            'value' => function($model, $index, $dataColumn) use ($user) {
+                $statusDropdown = $user::statusDropdown();
+                return $statusDropdown[$model->status];
+            },
+        ],
+        [
+            'attribute'=>'create_time',
             // 'value' => function ($model, $index, $widget) {
             //     return Yii::$app->formatter->asDate($model->created_at);
             // },
@@ -65,6 +89,15 @@ $this->params['breadcrumbs'][] = $this->title;
             'viewOptions' => ['title' => 'view', 'data-toggle' => 'tooltip'],
             'updateOptions' => ['title' => 'update', 'data-toggle' => 'tooltip'],
             'deleteOptions' => ['title' => 'delete', 'data-toggle' => 'tooltip'],
+            'buttons' => [
+                'delete' => function ($url , $model) {
+                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url,
+                        ['data-confirm' => 'Are you sure you want to delete this user?', 'data-method' =>'POST'] );
+                }
+            ],
+            'urlCreator' => function ($action, $model, $key, $index) {
+                return Url::to(['admin/view', 'id' => $model->id, 'act' => $action]);
+            }
         ],
         [
             'class' => '\kartik\grid\CheckboxColumn',
